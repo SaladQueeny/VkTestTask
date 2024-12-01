@@ -1,0 +1,70 @@
+version: '2.1'
+services:
+
+  java-service:
+    build:
+      context: .
+      dockerfile: Dockerfile-app
+    environment:
+      - "tarantool.nodes=172.20.0.3:3301"
+      - "tarantool.username=admin"
+      - "tarantool.password=admin"
+    ports:
+      - "8080:8080"
+      - "9090:9090"
+    networks:
+      tarantool-network:
+        ipv4_address: 172.20.0.2
+    links:
+      - tarantool-server1
+      - tarantool-server4
+
+  tarantool-server1:
+    build:
+      context: .
+      dockerfile: Dockerfile-tarantool
+    ports:
+      - "8081:8081"
+    command: bash -c "cd /opt/cartridge-app && rm -rf /tmp/run
+      && cartridge start router1 --name demo --script /opt/cartridge-app/init.lua --cfg /opt/cartridge-app/instances.yml"
+    networks:
+      tarantool-network:
+        ipv4_address: 172.20.0.3
+
+  tarantool-server4:
+    build:
+      context: .
+      dockerfile: Dockerfile-tarantool
+    command: bash -c "cd /opt/cartridge-app && rm -rf /tmp/run
+      && cartridge start storage1-master --name demo --script /opt/cartridge-app/init.lua --cfg /opt/cartridge-app/instances.yml"
+    networks:
+      tarantool-network:
+        ipv4_address: 172.20.0.6
+
+  tarantool-server5:
+    build:
+      context: .
+      dockerfile: Dockerfile-tarantool
+    command: bash -c "cd /opt/cartridge-app && rm -rf /tmp/run
+      && cartridge start storage1-replica1 --name demo --script /opt/cartridge-app/init.lua --cfg /opt/cartridge-app/instances.yml"
+    networks:
+      tarantool-network:
+        ipv4_address: 172.20.0.7
+
+  tarantool-server6:
+    build:
+      context: .
+      dockerfile: Dockerfile-tarantool
+    command: bash -c "cd /opt/cartridge-app && rm -rf /tmp/run
+      && cartridge start storage1-replica2 --name demo --script /opt/cartridge-app/init.lua --cfg /opt/cartridge-app/instances.yml"
+    networks:
+      tarantool-network:
+        ipv4_address: 172.20.0.8
+
+networks:
+  tarantool-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
+          gateway: 172.20.0.1

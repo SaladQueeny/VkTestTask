@@ -1,0 +1,45 @@
+syntax = "proto3";
+
+import "google/protobuf/empty.proto";
+
+option java_multiple_files = true;
+option java_package = "com.github.task.tarantool.demo";
+
+message PutObjectRequest {
+  string key = 1;
+  string value = 2;
+}
+
+message GetObjectRequest {
+  string key = 1;
+}
+
+message GetObjectResponse {
+  string value = 1;
+}
+
+message DeleteObjectRequest {
+  string key = 1;
+}
+
+message GetRangeObjectsRequest {
+  string key_since = 1;
+  string key_to = 2;
+}
+
+message BasicObject {
+  string key = 1;
+  string value = 2;
+}
+
+message ObjectCountResponse {
+    int32 count = 1;
+}
+
+service BasicService {
+  rpc putObject(PutObjectRequest) returns (BasicObject);
+  rpc getObject(GetObjectRequest) returns (GetObjectResponse);
+  rpc deleteObject(DeleteObjectRequest) returns (google.protobuf.Empty);
+  rpc getRange(GetRangeObjectsRequest) returns (stream BasicObject);
+  rpc getCount(google.protobuf.Empty) returns (ObjectCountResponse);
+}
