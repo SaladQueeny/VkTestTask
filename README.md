@@ -55,5 +55,7 @@ cartridge.admin_bootstrap_vshard()
 ```
 6. Админка Tarantool Cartridge http://localhost:8081/admin или
    http://192.168.99.100:8081/admin.
+
+   gRPC запросы отправляются по адресу localhost:9090
    
    
